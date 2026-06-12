@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DriveLog — Premium Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-0:#070912;
+  --bg-1:#0d1020;
+  --bg-2:#141830;
+  --glass:rgba(255,255,255,0.055);
+  --glass-2:rgba(255,255,255,0.085);
+  --glass-brd:rgba(255,255,255,0.10);
+  --glass-brd-2:rgba(255,255,255,0.16);
+  --txt:#f4f5fb;
+  --txt-2:#a6abc4;
+  --txt-3:#6a6f8a;
+  --gold-1:#e7c873;
+  --gold-2:#f6e3a6;
+  --gold-3:#b8923f;
+  --gold-grad:linear-gradient(135deg,#f6e3a6 0%,#e7c873 45%,#b8923f 100%);
+  --violet:#8b7ff0;
+  --violet-grad:linear-gradient(135deg,#a99bff 0%,#7a6cf0 100%);
+  --green:#5ee0a8;
+  --amber:#ffc15e;
+  --red:#ff7a85;
+  --r-lg:26px;
+  --r-md:20px;
+  --r-sm:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Manrope',system-ui,sans-serif;
+  background:
+    radial-gradient(1200px 700px at 15% -10%, rgba(124,108,240,0.20), transparent 55%),
+    radial-gradient(1000px 800px at 110% 10%, rgba(231,200,115,0.10), transparent 50%),
+    radial-gradient(900px 900px at 50% 120%, rgba(94,224,168,0.07), transparent 55%),
+    linear-gradient(160deg,#080a14 0%,#0c0f1d 50%,#070912 100%);
+  min-height:100vh;color:var(--txt);
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;
+  gap:48px;padding:56px 24px;
+}
+.intro{max-width:300px}
+.intro .logo{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.intro .mark{width:46px;height:46px;border-radius:14px;background:var(--gold-grad);
+  display:flex;align-items:center;justify-content:center;color:#1a1406;font-weight:800;font-size:22px;
+  box-shadow:0 8px 30px rgba(231,200,115,0.35)}
+.intro h1{font-family:'Sora';font-size:30px;font-weight:700;letter-spacing:-0.5px;line-height:1.05}
+.intro h1 span{background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.intro p{color:var(--txt-2);font-size:15px;line-height:1.7;margin-top:14px}
+.intro .tag{display:inline-flex;align-items:center;gap:7px;margin-top:20px;padding:8px 14px;
+  background:var(--glass);border:1px solid var(--glass-brd);border-radius:30px;font-size:12.5px;color:var(--txt-2)}
+.intro .tag b{color:var(--gold-2);font-weight:600}
+.intro .hint{margin-top:26px;font-size:12.5px;color:var(--txt-3);line-height:1.7}
+.intro .hint kbd{background:var(--glass-2);border:1px solid var(--glass-brd);border-radius:6px;padding:1px 7px;color:var(--txt);font-family:inherit;font-size:11.5px}
+
+/* ===== PHONE ===== */
+.phone{
+  position:relative;width:390px;height:844px;border-radius:54px;
+  background:linear-gradient(160deg,#1a1f38,#0a0c16);
+  padding:13px;
+  box-shadow:0 40px 120px rgba(0,0,0,0.65),0 0 0 1.5px rgba(255,255,255,0.06),
+    inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+.screenwrap{
+  position:relative;width:100%;height:100%;border-radius:42px;overflow:hidden;
+  background:linear-gradient(175deg,#0c0f1e 0%,#0a0c18 60%,#080a13 100%);
+}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:128px;height:30px;
+  background:#05060c;border-bottom-left-radius:18px;border-bottom-right-radius:18px;z-index:60}
+.statusbar{position:absolute;top:0;left:0;right:0;height:48px;z-index:55;
+  display:flex;align-items:center;justify-content:space-between;padding:14px 30px 0;
+  font-size:14px;font-weight:600;color:var(--txt);pointer-events:none}
+.statusbar .right{display:flex;align-items:center;gap:7px;font-size:13px}
+
+/* screens */
+.screens{position:absolute;inset:0}
+.screen{position:absolute;inset:0;padding:56px 20px 96px;overflow-y:auto;
+  opacity:0;visibility:hidden;transform:translateY(14px) scale(0.99);
+  transition:opacity .42s cubic-bezier(.22,1,.36,1),transform .42s cubic-bezier(.22,1,.36,1),visibility .42s;
+  scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{opacity:1;visibility:visible;transform:none}
+
+/* header */
+.scr-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.scr-head .title{font-family:'Sora';font-size:25px;font-weight:600;letter-spacing:-0.5px}
+.scr-head .sub{font-size:12.5px;color:var(--txt-3);margin-top:2px}
+.avatar{width:42px;height:42px;border-radius:14px;background:var(--violet-grad);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#0d0a26;
+  box-shadow:0 6px 20px rgba(123,108,240,0.4)}
+.iconbtn{width:42px;height:42px;border-radius:14px;background:var(--glass);border:1px solid var(--glass-brd);
+  display:flex;align-items:center;justify-content:center;color:var(--txt);cursor:pointer;transition:.2s}
+.iconbtn:active{transform:scale(.92);background:var(--glass-2)}
+
+/* glass card */
+.card{background:var(--glass);border:1px solid var(--glass-brd);border-radius:var(--r-md);
+  padding:18px;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  position:relative;overflow:hidden}
+.card+.card{margin-top:14px}
+.card .sheen{position:absolute;top:-40%;right:-30%;width:180px;height:180px;
+  background:radial-gradient(circle,rgba(231,200,115,0.16),transparent 70%);pointer-events:none}
+
+/* car switcher chip */
+.carchip{display:flex;align-items:center;gap:10px;background:var(--glass);border:1px solid var(--glass-brd);
+  border-radius:30px;padding:7px 14px 7px 8px;font-size:13px;font-weight:600;cursor:pointer;transition:.2s}
+.carchip:active{transform:scale(.97)}
+.carchip .dot{width:30px;height:30px;border-radius:50%;background:var(--gold-grad);display:flex;align-items:center;justify-content:center;color:#1a1406}
+.carchip i{color:var(--txt-3)}
+
+/* health gauge */
+.health{display:flex;align-items:center;gap:20px}
+.gauge{position:relative;width:128px;height:128px;flex-shrink:0}
+.gauge svg{transform:rotate(-90deg)}
+.gauge .val{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gauge .num{font-family:'Sora';font-size:34px;font-weight:700;line-height:1;
+  background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.gauge .pct{font-size:12px;color:var(--txt-3);margin-top:2px}
+.health .meta h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.health .meta .line{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--txt-2);margin-bottom:7px}
+.health .meta .line .ic{width:24px;height:24px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.ic.g{background:rgba(94,224,168,0.14);color:var(--green)}
+.ic.a{background:rgba(255,193,94,0.14);color:var(--amber)}
+.ic.r{background:rgba(255,122,133,0.14);color:var(--red)}
+
+/* stat grid */
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.stat{background:var(--glass);border:1px solid var(--glass-brd);border-radius:var(--r-sm);padding:15px}
+.stat .lbl{font-size:11.5px;color:var(--txt-3);display:flex;align-items:center;gap:6px;margin-bottom:9px}
+.stat .big{font-family:'Sora';font-size:22px;font-weight:600;letter-spacing:-0.5px}
+.stat .big small{font-size:13px;color:var(--txt-3);font-weight:400}
+.stat .bar{height:5px;border-radius:5px;background:rgba(255,255,255,0.08);margin-top:11px;overflow:hidden}
+.stat .bar i{display:block;height:100%;border-radius:5px}
+.fill-gold{background:var(--gold-grad)}
+.fill-green{background:linear-gradient(90deg,#3fbf86,#5ee0a8)}
+.fill-amber{background:linear-gradient(90deg,#e09a2e,#ffc15e)}
+.fill-violet{background:var(--violet-grad)}
+
+/* section label */
+.seclabel{display:flex;align-items:center;justify-content:space-between;margin:22px 4px 12px}
+.seclabel h4{font-size:14px;font-weight:600}
+.seclabel a{font-size:12px;color:var(--gold-2);cursor:pointer}
+
+/* reminder row */
+.rem{display:flex;align-items:center;gap:13px;background:var(--glass);border:1px solid var(--glass-brd);
+  border-radius:var(--r-sm);padding:13px 15px;margin-bottom:10px;cursor:pointer;transition:.2s}
+.rem:active{transform:scale(.98);background:var(--glass-2)}
+.rem .udot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.udot.r{background:var(--red);box-shadow:0 0 10px var(--red)}
+.udot.a{background:var(--amber);box-shadow:0 0 10px var(--amber)}
+.udot.g{background:var(--green);box-shadow:0 0 10px var(--green)}
+.rem .ri{width:38px;height:38px;border-radius:11px;background:var(--glass-2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.rem .rbody{flex:1;min-width:0}
+.rem .rbody .t{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rem .rbody .s{font-size:11.5px;color:var(--txt-3);margin-top:2px}
+.rem .rright{text-align:right;flex-shrink:0}
+.rem .rright .d{font-size:13px;font-weight:600}
+.rem .rright .d.red{color:var(--red)}.rem .rright .d.amber{color:var(--amber)}
+.rem .rright .u{font-size:10.5px;color:var(--txt-3)}
+
+/* car list cards */
+.carcard{background:var(--glass);border:1px solid var(--glass-brd);border-radius:var(--r-md);
+  overflow:hidden;margin-bottom:14px;cursor:pointer;transition:.25s;position:relative}
+.carcard:active{transform:scale(.98)}
+.carcard .photo{height:130px;position:relative;
+  background:linear-gradient(135deg,#23284a,#15182c);display:flex;align-items:flex-end;padding:14px}
+.carcard .photo.c2{background:linear-gradient(135deg,#2a2238,#161224)}
+.carcard .photo .carglyph{position:absolute;right:-6px;top:50%;transform:translateY(-50%);font-size:96px;opacity:.13}
+.carcard .photo .plate{background:rgba(0,0,0,0.45);border:1px solid var(--glass-brd);border-radius:8px;
+  padding:4px 11px;font-size:12px;font-weight:600;letter-spacing:1px;backdrop-filter:blur(8px)}
+.carcard .photo .badge{position:absolute;top:12px;right:12px;font-size:10.5px;font-weight:600;
+  padding:5px 11px;border-radius:20px;backdrop-filter:blur(8px)}
+.badge.ok{background:rgba(94,224,168,0.18);color:var(--green);border:1px solid rgba(94,224,168,0.3)}
+.badge.warn{background:rgba(255,193,94,0.18);color:var(--amber);border:1px solid rgba(255,193,94,0.3)}
+.carcard .info{padding:15px 16px;display:flex;align-items:center;justify-content:space-between}
+.carcard .info h3{font-family:'Sora';font-size:17px;font-weight:600}
+.carcard .info .m{font-size:12px;color:var(--txt-3);margin-top:3px}
+.carcard .info .km{text-align:right}
+.carcard .info .km b{font-family:'Sora';font-size:16px;font-weight:600;display:block}
+.carcard .info .km span{font-size:11px;color:var(--txt-3)}
+
+/* timeline / history */
+.tl{position:relative;padding-left:30px}
+.tl::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:linear-gradient(180deg,rgba(231,200,115,0.5),rgba(255,255,255,0.05))}
+.tlitem{position:relative;margin-bottom:14px}
+.tlitem .node{position:absolute;left:-30px;top:14px;width:20px;height:20px;border-radius:50%;
+  background:var(--bg-1);border:2px solid var(--gold-1);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--gold-2)}
+.tlitem .ev{background:var(--glass);border:1px solid var(--glass-brd);border-radius:var(--r-sm);padding:13px 15px;cursor:pointer;transition:.2s}
+.tlitem .ev:active{transform:scale(.98)}
+.tlitem .ev .top{display:flex;align-items:center;justify-content:space-between}
+.tlitem .ev .name{font-size:13.5px;font-weight:600}
+.tlitem .ev .cost{font-family:'Sora';font-size:14px;font-weight:600;color:var(--gold-2)}
+.tlitem .ev .det{display:flex;gap:14px;margin-top:8px;font-size:11.5px;color:var(--txt-3)}
+.tlitem .ev .det span{display:flex;align-items:center;gap:4px}
+
+/* filters */
+.filters{display:flex;gap:8px;overflow-x:auto;margin-bottom:18px;padding-bottom:2px;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.chip{white-space:nowrap;font-size:12.5px;padding:8px 15px;border-radius:20px;background:var(--glass);
+  border:1px solid var(--glass-brd);color:var(--txt-2);cursor:pointer;transition:.2s;flex-shrink:0}
+.chip.on{background:var(--gold-grad);color:#1a1406;border-color:transparent;font-weight:600}
+
+/* add-event form */
+.typegrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:18px}
+.typecard{background:var(--glass);border:1px solid var(--glass-brd);border-radius:var(--r-sm);
+  padding:16px 14px;cursor:pointer;transition:.2s;text-align:left}
+.typecard:active{transform:scale(.97)}
+.typecard.sel{border-color:var(--gold-1);background:rgba(231,200,115,0.10)}
+.typecard .tcic{width:40px;height:40px;border-radius:12px;background:var(--glass-2);display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:11px}
+.typecard.sel .tcic{background:var(--gold-grad);color:#1a1406}
+.typecard .tcn{font-size:13.5px;font-weight:600}
+.typecard .tcs{font-size:11px;color:var(--txt-3);margin-top:2px}
+.field{margin-bottom:14px}
+.field label{font-size:12px;color:var(--txt-3);margin-bottom:7px;display:block;padding-left:2px}
+.field .inp{background:var(--glass);border:1px solid var(--glass-brd);border-radius:var(--r-sm);
+  padding:14px 15px;font-size:14px;color:var(--txt);display:flex;align-items:center;justify-content:space-between}
+.field .inp .ph{color:var(--txt-3)}
+.field .inp.val{font-weight:600}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.btn-primary{background:var(--gold-grad);color:#1a1406;font-weight:700;font-size:15px;
+  border:none;border-radius:var(--r-sm);padding:16px;width:100%;cursor:pointer;font-family:inherit;
+  box-shadow:0 10px 30px rgba(231,200,115,0.3);transition:.2s;margin-top:6px}
+.btn-primary:active{transform:scale(.98)}
+.autohint{display:flex;align-items:center;gap:9px;background:rgba(123,108,240,0.10);
+  border:1px solid rgba(123,108,240,0.25);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:16px}
+.autohint .ic{font-size:17px;color:var(--violet)}
+.autohint p{font-size:12px;color:var(--txt-2);line-height:1.5}
+.autohint b{color:var(--gold-2)}
+
+/* tire detail */
+.tireset{display:flex;gap:12px;margin-bottom:16px}
+.tireset .ts{flex:1;background:var(--glass);border:1px solid var(--glass-brd);border-radius:var(--r-md);padding:16px;position:relative;cursor:pointer;transition:.2s}
+.tireset .ts.active-set{border-color:var(--gold-1);background:rgba(231,200,115,0.08)}
+.tireset .ts .season{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;margin-bottom:12px}
+.tireset .ts .season .si{width:28px;height:28px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.si.winter{background:rgba(133,183,235,0.16);color:#85b7eb}
+.si.summer{background:rgba(255,193,94,0.16);color:var(--amber)}
+.tireset .ts .now{position:absolute;top:14px;right:14px;font-size:9.5px;font-weight:700;color:var(--gold-2);
+  background:rgba(231,200,115,0.14);padding:3px 8px;border-radius:10px}
+.tireset .ts .spec{font-size:11.5px;color:var(--txt-3);margin-bottom:4px}
+.tireset .ts .spec b{color:var(--txt);font-weight:600}
+.tireset .ts .km{font-family:'Sora';font-size:18px;font-weight:600;margin-top:8px}
+.tireset .ts .km small{font-size:11px;color:var(--txt-3);font-weight:400}
+.tread{margin-top:10px}
+.tread .tlbl{display:flex;justify-content:space-between;font-size:11px;color:var(--txt-3);margin-bottom:6px}
+.tread .tbar{height:6px;border-radius:6px;background:rgba(255,255,255,0.08);overflow:hidden}
+.tread .tbar i{display:block;height:100%;border-radius:6px}
+
+/* settings */
+.setgroup{background:var(--glass);border:1px solid var(--glass-brd);border-radius:var(--r-md);overflow:hidden;margin-bottom:16px}
+.setrow{display:flex;align-items:center;gap:13px;padding:15px 16px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:.2s}
+.setrow:last-child{border-bottom:none}
+.setrow:active{background:var(--glass-2)}
+.setrow .si2{width:34px;height:34px;border-radius:10px;background:var(--glass-2);display:flex;align-items:center;justify-content:center;font-size:16px}
+.setrow .stxt{flex:1}
+.setrow .stxt .n{font-size:14px;font-weight:500}
+.setrow .stxt .d{font-size:11.5px;color:var(--txt-3);margin-top:1px}
+.setrow .val{font-size:12.5px;color:var(--txt-3);display:flex;align-items:center;gap:6px}
+.toggle{width:46px;height:27px;border-radius:20px;background:var(--gold-grad);position:relative;flex-shrink:0}
+.toggle::after{content:"";position:absolute;top:3px;right:3px;width:21px;height:21px;border-radius:50%;background:#fff}
+.toggle.off{background:rgba(255,255,255,0.12)}
+.toggle.off::after{right:auto;left:3px}
+
+/* tab bar */
+.tabbar{position:absolute;bottom:0;left:0;right:0;height:84px;z-index:50;
+  background:linear-gradient(180deg,rgba(10,12,22,0.4),rgba(8,10,18,0.92));
+  backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);
+  border-top:1px solid rgba(255,255,255,0.07);
+  display:flex;align-items:flex-start;justify-content:space-around;padding:13px 14px 0}
+.tab{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;color:var(--txt-3);
+  font-size:10px;font-weight:500;transition:.2s;flex:1;padding-top:2px}
+.tab i{font-size:22px}
+.tab.on{color:var(--gold-2)}
+.tab.on i{filter:drop-shadow(0 0 10px rgba(231,200,115,0.5))}
+
+/* FAB */
+.fab{position:absolute;bottom:100px;right:20px;z-index:52;width:60px;height:60px;border-radius:20px;
+  background:var(--gold-grad);display:flex;align-items:center;justify-content:center;font-size:28px;color:#1a1406;
+  cursor:pointer;box-shadow:0 14px 34px rgba(231,200,115,0.42);transition:.2s;border:none}
+.fab:active{transform:scale(.92) rotate(90deg)}
+
+/* back btn */
+.backbtn{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--txt-2);cursor:pointer;margin-bottom:6px}
+
+/* notif banner */
+.tempnote{display:flex;align-items:center;gap:11px;background:rgba(133,183,235,0.10);
+  border:1px solid rgba(133,183,235,0.25);border-radius:var(--r-sm);padding:13px 15px;margin-bottom:16px}
+.tempnote .ic{font-size:20px;color:#85b7eb}
+.tempnote p{font-size:12px;color:var(--txt-2);line-height:1.5}
+.tempnote b{color:#aacdf5}
+
+@media(max-width:900px){.intro{order:2;text-align:center}.intro .logo{justify-content:center}}
+
+.material-icons-outlined{font-family:'Material Icons Outlined'}
+</style>
+</head>
+<body>
+
+<div class="intro">
+  <div class="logo">
+    <div class="mark">D</div>
+    <div>
+      <div style="font-size:11px;color:var(--txt-3);letter-spacing:2px;font-weight:600">PREMIUM PROTOTYPE</div>
+      <div style="font-family:'Sora';font-size:19px;font-weight:600;margin-top:1px">DriveLog</div>
+    </div>
+  </div>
+  <h1>Учёт авто <span>премиум-класса</span></h1>
+  <p>Кликабельный прототип в стиле Mercedes MBUX: тёмные градиенты, стекломорфизм и золотые акценты. Полностью интерактивный — переключайте экраны через нижнее меню или карточки.</p>
+  <div class="tag"><span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block"></span> <b>7 экранов</b> · живая навигация</div>
+  <div class="hint">Нажимайте на вкладки внизу, кнопку <kbd>+</kbd>, карточки авто и напоминания. Всё кликается.</div>
+</div>
+
+<div class="phone">
+  <div class="screenwrap">
+    <div class="notch"></div>
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="right">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><rect x="0" y="3" width="3" height="6" rx="1" fill="white"/><rect x="4.5" y="1.5" width="3" height="7.5" rx="1" fill="white"/><rect x="9" y="0" width="3" height="9" rx="1" fill="white"/><rect x="13.5" y="0" width="3" height="9" rx="1" fill="white" opacity=".4"/></svg>
+        <svg width="22" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="20" height="11" rx="3" stroke="white" opacity=".5"/><rect x="2" y="2" width="15" height="8" rx="1.5" fill="white"/><rect x="21.5" y="4" width="2" height="4" rx="1" fill="white" opacity=".5"/></svg>
+      </span>
+    </div>
+
+    <div class="screens">
+
+      <!-- ===== DASHBOARD ===== -->
+      <div class="screen active" data-screen="dashboard">
+        <div class="scr-head">
+          <div class="carchip" onclick="go('garage')">
+            <span class="dot" style="font-weight:700;font-size:13px">T</span>
+            <span>Toyota Camry</span>
+            <i style="font-style:normal">⌄</i>
+          </div>
+          <div class="avatar">АФ</div>
+        </div>
+
+        <div class="card">
+          <div class="sheen"></div>
+          <div class="health">
+            <div class="gauge">
+              <svg width="128" height="128">
+                <circle cx="64" cy="64" r="56" stroke="rgba(255,255,255,0.07)" stroke-width="11" fill="none"/>
+                <circle cx="64" cy="64" r="56" stroke="url(#gg)" stroke-width="11" fill="none"
+                  stroke-linecap="round" stroke-dasharray="351.8" stroke-dashoffset="49.2"/>
+                <defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#f6e3a6"/><stop offset="0.5" stop-color="#e7c873"/><stop offset="1" stop-color="#b8923f"/>
+                </linearGradient></defs>
+              </svg>
+              <div class="val"><div class="num">86</div><div class="pct">здоровье</div></div>
+            </div>
+            <div class="meta">
+              <h3>Хорошее состояние</h3>
+              <div class="line"><span class="ic g">✓</span> Масло и фильтры в норме</div>
+              <div class="line"><span class="ic a">!</span> ТО через 1 200 км</div>
+              <div class="line"><span class="ic r">●</span> Воздушный фильтр просрочен</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="statgrid">
+          <div class="stat">
+            <div class="lbl">◷ Масло двигателя</div>
+            <div class="big">5 800<small> / 8000 км</small></div>
+            <div class="bar"><i class="fill-green" style="width:72%"></i></div>
+          </div>
+          <div class="stat">
+            <div class="lbl">⚙ Ближайшее ТО</div>
+            <div class="big">1 200<small> км</small></div>
+            <div class="bar"><i class="fill-amber" style="width:85%"></i></div>
+          </div>
+          <div class="stat">
+            <div class="lbl">◎ Пробег</div>
+            <div class="big">87 500<small> км</small></div>
+            <div class="bar"><i class="fill-gold" style="width:60%"></i></div>
+          </div>
+          <div class="stat" onclick="go('tire')" style="cursor:pointer">
+            <div class="lbl">❄ Шины · зима</div>
+            <div class="big">12 400<small> км</small></div>
+            <div class="bar"><i class="fill-violet" style="width:45%"></i></div>
+          </div>
+        </div>
+
+        <div class="seclabel"><h4>Напоминания · эта неделя</h4><a onclick="go('reminders')">всё →</a></div>
+        <div class="rem" onclick="go('reminders')">
+          <span class="udot r"></span>
+          <div class="ri">🌬</div>
+          <div class="rbody"><div class="t">Воздушный фильтр</div><div class="s">просрочено на 500 км</div></div>
+          <div class="rright"><div class="d red">−500</div><div class="u">км</div></div>
+        </div>
+        <div class="rem" onclick="go('reminders')">
+          <span class="udot a"></span>
+          <div class="ri">⚙</div>
+          <div class="rbody"><div class="t">Плановое ТО-3</div><div class="s">15 июля 2026</div></div>
+          <div class="rright"><div class="d amber">33</div><div class="u">дня</div></div>
+        </div>
+        <div class="rem" onclick="go('reminders')">
+          <span class="udot g"></span>
+          <div class="ri">🛢</div>
+          <div class="rbody"><div class="t">Замена масла КПП</div><div class="s">при 120 000 км</div></div>
+          <div class="rright"><div class="d">32 500</div><div class="u">км</div></div>
+        </div>
+      </div>
+
+      <!-- ===== GARAGE ===== -->
+      <div class="screen" data-screen="garage">
+        <div class="scr-head">
+          <div><div class="title">Гараж</div><div class="sub">2 автомобиля</div></div>
+          <div class="iconbtn" onclick="go('add')" style="font-size:22px">+</div>
+        </div>
+
+        <div class="carcard" onclick="go('dashboard')">
+          <div class="photo">
+            <span class="carglyph">🚗</span>
+            <span class="badge ok">86% · норма</span>
+            <span class="plate">А 123 ВС · 777</span>
+          </div>
+          <div class="info">
+            <div><h3>Toyota Camry</h3><div class="m">2018 · 2.5 бензин · серебристый</div></div>
+            <div class="km"><b>87 500</b><span>км</span></div>
+          </div>
+        </div>
+
+        <div class="carcard" onclick="go('dashboard')">
+          <div class="photo c2">
+            <span class="carglyph">🚙</span>
+            <span class="badge warn">64% · скоро ТО</span>
+            <span class="plate">Е 777 КХ · 199</span>
+          </div>
+          <div class="info">
+            <div><h3>Volkswagen Tiguan</h3><div class="m">2021 · 2.0 TSI · чёрный</div></div>
+            <div class="km"><b>41 200</b><span>км</span></div>
+          </div>
+        </div>
+
+        <div class="card" style="border-style:dashed;text-align:center;cursor:pointer;margin-top:4px" onclick="go('add')">
+          <div style="font-size:26px;margin-bottom:6px;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:700">+</div>
+          <div style="font-size:13.5px;font-weight:600">Добавить автомобиль</div>
+          <div style="font-size:11.5px;color:var(--txt-3);margin-top:3px">осталось 1 из 3 в бесплатной версии</div>
+        </div>
+      </div>
+
+      <!-- ===== ADD EVENT ===== -->
+      <div class="screen" data-screen="add">
+        <div class="backbtn" onclick="go('dashboard')">‹ назад</div>
+        <div class="scr-head"><div class="title">Новое событие</div></div>
+
+        <div class="typegrid">
+          <div class="typecard sel"><div class="tcic">🛢</div><div class="tcn">Масло двигателя</div><div class="tcs">синтетика 5W-30</div></div>
+          <div class="typecard"><div class="tcic">🌬</div><div class="tcn">Фильтры</div><div class="tcs">4 типа</div></div>
+          <div class="typecard"><div class="tcic">❄</div><div class="tcn">Шины</div><div class="tcs">смена сезона</div></div>
+          <div class="typecard"><div class="tcic">⚙</div><div class="tcn">ТО</div><div class="tcs">плановое</div></div>
+        </div>
+
+        <div class="field"><label>Дата</label><div class="inp val">12 июня 2026 <i style="color:var(--txt-3);font-style:normal">📅</i></div></div>
+        <div class="row2">
+          <div class="field"><label>Пробег</label><div class="inp val">87 500 <span style="color:var(--txt-3);font-size:12px">км</span></div></div>
+          <div class="field"><label>Стоимость</label><div class="inp val">6 800 <span style="color:var(--txt-3);font-size:12px">₽</span></div></div>
+        </div>
+        <div class="field"><label>Расходник</label><div class="inp val">Mobil 1 5W-30</div></div>
+        <div class="field"><label>Место сервиса</label><div class="inp"><span class="ph">«У Михалыча»</span></div></div>
+
+        <div class="autohint">
+          <span class="ic">✦</span>
+          <p>Следующая замена рассчитается автоматически: <b>через 8 000 км</b> (≈95 500 км) или <b>12 месяцев</b> — что наступит раньше.</p>
+        </div>
+
+        <div class="field"><label>Фото чека</label>
+          <div class="inp"><span class="ph">📷 Прикрепить фото</span><span style="color:var(--gold-2);font-size:12px">+ добавить</span></div>
+        </div>
+
+        <button class="btn-primary" onclick="go('history')">Сохранить событие</button>
+      </div>
+
+      <!-- ===== HISTORY ===== -->
+      <div class="screen" data-screen="history">
+        <div class="scr-head">
+          <div><div class="title">История</div><div class="sub">Toyota Camry · 34 записи</div></div>
+          <div class="iconbtn" onclick="go('stats')">📊</div>
+        </div>
+
+        <div class="filters">
+          <div class="chip on">Все</div><div class="chip">Масло</div><div class="chip">Фильтры</div>
+          <div class="chip">Шины</div><div class="chip">ТО</div>
+        </div>
+
+        <div class="card" style="margin-bottom:20px;padding:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:11.5px;color:var(--txt-3)">Потрачено за 2026</div>
+              <div style="font-family:'Sora';font-size:24px;font-weight:600;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">48 300 ₽</div></div>
+            <div style="text-align:right"><div style="font-size:11.5px;color:var(--txt-3)">средний чек</div>
+              <div style="font-family:'Sora';font-size:18px;font-weight:600">5 367 ₽</div></div>
+          </div>
+        </div>
+
+        <div class="tl">
+          <div class="tlitem"><div class="node">🛢</div>
+            <div class="ev"><div class="top"><span class="name">Масло двигателя · Mobil 1</span><span class="cost">6 800 ₽</span></div>
+              <div class="det"><span>📅 12 июн</span><span>◎ 87 500 км</span><span>📍 У Михалыча</span></div></div></div>
+          <div class="tlitem"><div class="node">❄</div>
+            <div class="ev" onclick="go('tire')"><div class="top"><span class="name">Смена на зимние · Nokian</span><span class="cost">3 200 ₽</span></div>
+              <div class="det"><span>📅 15 окт</span><span>◎ 75 100 км</span><span>📍 Шиномонтаж №7</span></div></div></div>
+          <div class="tlitem"><div class="node">🌬</div>
+            <div class="ev"><div class="top"><span class="name">Салонный фильтр</span><span class="cost">1 400 ₽</span></div>
+              <div class="det"><span>📅 3 сен</span><span>◎ 72 800 км</span><span>📍 сам</span></div></div></div>
+          <div class="tlitem"><div class="node">⚙</div>
+            <div class="ev"><div class="top"><span class="name">ТО-2 плановое</span><span class="cost">14 500 ₽</span></div>
+              <div class="det"><span>📅 20 июл</span><span>◎ 70 000 км</span><span>📍 Тойота Центр</span></div></div></div>
+          <div class="tlitem"><div class="node">🛢</div>
+            <div class="ev"><div class="top"><span class="name">Масло двигателя · Mobil 1</span><span class="cost">6 600 ₽</span></div>
+              <div class="det"><span>📅 18 фев</span><span>◎ 67 500 км</span><span>📍 У Михалыча</span></div></div></div>
+        </div>
+      </div>
+
+      <!-- ===== STATS ===== -->
+      <div class="screen" data-screen="stats">
+        <div class="backbtn" onclick="go('history')">‹ история</div>
+        <div class="scr-head"><div class="title">Расходы</div><div class="avatar" style="background:var(--gold-grad);color:#1a1406">₽</div></div>
+
+        <div class="statgrid" style="margin-top:0">
+          <div class="stat"><div class="lbl">за год</div><div class="big">48 300<small> ₽</small></div></div>
+          <div class="stat"><div class="lbl">средний чек</div><div class="big">5 367<small> ₽</small></div></div>
+          <div class="stat"><div class="lbl">на 1 км</div><div class="big">2.4<small> ₽</small></div></div>
+          <div class="stat"><div class="lbl">записей</div><div class="big">34</div></div>
+        </div>
+
+        <div class="seclabel"><h4>По месяцам</h4></div>
+        <div class="card">
+          <div style="display:flex;align-items:flex-end;gap:9px;height:130px">
+            <div style="flex:1;text-align:center"><div style="height:40px;background:var(--gold-grad);border-radius:7px"></div><div style="font-size:10px;color:var(--txt-3);margin-top:7px">фев</div></div>
+            <div style="flex:1;text-align:center"><div style="height:18px;background:rgba(255,255,255,0.12);border-radius:7px"></div><div style="font-size:10px;color:var(--txt-3);margin-top:7px">апр</div></div>
+            <div style="flex:1;text-align:center"><div style="height:90px;background:var(--gold-grad);border-radius:7px"></div><div style="font-size:10px;color:var(--txt-3);margin-top:7px">июл</div></div>
+            <div style="flex:1;text-align:center"><div style="height:28px;background:rgba(255,255,255,0.12);border-radius:7px"></div><div style="font-size:10px;color:var(--txt-3);margin-top:7px">сен</div></div>
+            <div style="flex:1;text-align:center"><div style="height:55px;background:rgba(255,255,255,0.12);border-radius:7px"></div><div style="font-size:10px;color:var(--txt-3);margin-top:7px">окт</div></div>
+            <div style="flex:1;text-align:center"><div style="height:46px;background:var(--gold-grad);border-radius:7px"></div><div style="font-size:10px;color:var(--txt-3);margin-top:7px">июн</div></div>
+          </div>
+        </div>
+
+        <div class="seclabel"><h4>По категориям</h4></div>
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px"><span style="font-size:13px;display:flex;gap:9px;align-items:center"><span style="width:11px;height:11px;border-radius:3px;background:var(--gold-1)"></span>ТО</span><b style="font-family:'Sora'">18 900 ₽</b></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px"><span style="font-size:13px;display:flex;gap:9px;align-items:center"><span style="width:11px;height:11px;border-radius:3px;background:var(--violet)"></span>Масло</span><b style="font-family:'Sora'">13 400 ₽</b></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px"><span style="font-size:13px;display:flex;gap:9px;align-items:center"><span style="width:11px;height:11px;border-radius:3px;background:var(--green)"></span>Шины</span><b style="font-family:'Sora'">9 600 ₽</b></div>
+          <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;display:flex;gap:9px;align-items:center"><span style="width:11px;height:11px;border-radius:3px;background:#85b7eb"></span>Фильтры</span><b style="font-family:'Sora'">6 400 ₽</b></div>
+        </div>
+
+        <button class="btn-primary" style="background:var(--glass);color:var(--txt);box-shadow:none;border:1px solid var(--glass-brd)">⤓ Экспорт в PDF для продажи</button>
+      </div>
+
+      <!-- ===== TIRE DETAIL ===== -->
+      <div class="screen" data-screen="tire">
+        <div class="backbtn" onclick="go('dashboard')">‹ дашборд</div>
+        <div class="scr-head"><div class="title">Шины</div><div class="sub" style="margin-top:6px">Toyota Camry</div></div>
+
+        <div class="tempnote">
+          <span class="ic">🌡</span>
+          <p>За окном стабильно <b>+12 °C</b>. Рекомендуем сменить зимние шины на летние в ближайшие дни.</p>
+        </div>
+
+        <div class="tireset">
+          <div class="ts active-set">
+            <span class="now">УСТАНОВЛЕНЫ</span>
+            <div class="season"><span class="si winter">❄</span> Зима</div>
+            <div class="spec">Nokian <b>Hakkapeliitta 10</b></div>
+            <div class="spec">205/55 R16 · <b>шип</b></div>
+            <div class="km">12 400 <small>км на сезон</small></div>
+            <div class="tread"><div class="tlbl"><span>протектор</span><span style="color:var(--green)">8.5 мм</span></div><div class="tbar"><i class="fill-green" style="width:85%"></i></div></div>
+          </div>
+          <div class="ts">
+            <div class="season"><span class="si summer">☀</span> Лето</div>
+            <div class="spec">Michelin <b>Primacy 4</b></div>
+            <div class="spec">205/55 R16 · <b>липучка</b></div>
+            <div class="km">34 800 <small>км всего</small></div>
+            <div class="tread"><div class="tlbl"><span>протектор</span><span style="color:var(--amber)">4.2 мм</span></div><div class="tbar"><i class="fill-amber" style="width:42%"></i></div></div>
+          </div>
+        </div>
+
+        <button class="btn-primary" onclick="go('add')">↺ Установить летний комплект</button>
+
+        <div class="seclabel"><h4>История установок</h4></div>
+        <div class="rem"><span class="udot g"></span><div class="ri">❄</div><div class="rbody"><div class="t">Установлены зимние</div><div class="s">15 окт 2025 · 75 100 км</div></div><div class="rright"><div class="d">+12 400</div><div class="u">км</div></div></div>
+        <div class="rem"><span class="udot a"></span><div class="ri">☀</div><div class="rbody"><div class="t">Установлены летние</div><div class="s">12 апр 2025 · 67 300 км</div></div><div class="rright"><div class="d">+7 800</div><div class="u">км</div></div></div>
+        <div class="rem"><span class="udot g"></span><div class="ri">❄</div><div class="rbody"><div class="t">Установлены зимние</div><div class="s">20 окт 2024 · 55 600 км</div></div><div class="rright"><div class="d">+11 700</div><div class="u">км</div></div></div>
+      </div>
+
+      <!-- ===== REMINDERS ===== -->
+      <div class="screen" data-screen="reminders">
+        <div class="scr-head">
+          <div><div class="title">Напоминания</div><div class="sub">3 активных · 1 просрочено</div></div>
+          <div class="iconbtn">📅</div>
+        </div>
+
+        <div class="seclabel" style="margin-top:0"><h4 style="color:var(--red)">Просрочено</h4></div>
+        <div class="rem"><span class="udot r"></span><div class="ri">🌬</div><div class="rbody"><div class="t">Воздушный фильтр</div><div class="s">пробег 87 000 км пройден</div></div><div class="rright"><div class="d red">−500</div><div class="u">км</div></div></div>
+
+        <div class="seclabel"><h4 style="color:var(--amber)">Эта неделя</h4></div>
+        <div class="rem"><span class="udot a"></span><div class="ri">☀</div><div class="rbody"><div class="t">Смена на летние шины</div><div class="s">+12 °C за окном</div></div><div class="rright"><div class="d amber">3</div><div class="u">дня</div></div></div>
+
+        <div class="seclabel"><h4 style="color:var(--txt-2)">Этот месяц</h4></div>
+        <div class="rem"><span class="udot a"></span><div class="ri">⚙</div><div class="rbody"><div class="t">Плановое ТО-3</div><div class="s">15 июля 2026</div></div><div class="rright"><div class="d amber">33</div><div class="u">дня</div></div></div>
+
+        <div class="seclabel"><h4 style="color:var(--txt-2)">Позже</h4></div>
+        <div class="rem"><span class="udot g"></span><div class="ri">🛢</div><div class="rbody"><div class="t">Масло двигателя</div><div class="s">при 95 500 км</div></div><div class="rright"><div class="d">8 000</div><div class="u">км</div></div></div>
+        <div class="rem"><span class="udot g"></span><div class="ri">🛢</div><div class="rbody"><div class="t">Масло КПП</div><div class="s">при 120 000 км</div></div><div class="rright"><div class="d">32 500</div><div class="u">км</div></div></div>
+
+        <div style="display:flex;gap:10px;margin-top:14px">
+          <button class="btn-primary" style="background:var(--glass);color:var(--txt);box-shadow:none;border:1px solid var(--glass-brd);font-size:13px">Отложить на день</button>
+          <button class="btn-primary" style="font-size:13px" onclick="go('add')">Выполнить</button>
+        </div>
+      </div>
+
+      <!-- ===== SETTINGS ===== -->
+      <div class="screen" data-screen="settings">
+        <div class="scr-head"><div class="title">Настройки</div><div class="avatar">АФ</div></div>
+
+        <div class="card" style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+          <div class="avatar" style="width:50px;height:50px;border-radius:16px;font-size:17px">АФ</div>
+          <div style="flex:1"><div style="font-size:15px;font-weight:600">Али Файзуллаев</div><div style="font-size:12px;color:var(--txt-3)">Гостевой режим · локально</div></div>
+          <div style="font-size:11px;font-weight:700;color:#1a1406;background:var(--gold-grad);padding:6px 13px;border-radius:20px">PRO</div>
+        </div>
+
+        <div class="setgroup">
+          <div class="setrow"><span class="si2">🎨</span><div class="stxt"><div class="n">Тема</div><div class="d">оформление приложения</div></div><span class="val">Тёмная ›</span></div>
+          <div class="setrow"><span class="si2">📏</span><div class="stxt"><div class="n">Единицы</div></div><span class="val">км · литры ›</span></div>
+          <div class="setrow"><span class="si2">🌐</span><div class="stxt"><div class="n">Язык</div></div><span class="val">Русский ›</span></div>
+        </div>
+
+        <div class="setgroup">
+          <div class="setrow"><span class="si2">🔔</span><div class="stxt"><div class="n">Напоминать заранее</div></div><span class="val">за 3 дня ›</span></div>
+          <div class="setrow"><span class="si2">👤</span><div class="stxt"><div class="n">Face ID для входа</div></div><span class="toggle"></span></div>
+          <div class="setrow"><span class="si2">🌡</span><div class="stxt"><div class="n">Шины по погоде</div></div><span class="toggle"></span></div>
+        </div>
+
+        <div class="setgroup">
+          <div class="setrow"><span class="si2">☁</span><div class="stxt"><div class="n">Резервная копия</div><div class="d">iCloud · вчера 21:40</div></div><span class="val">›</span></div>
+          <div class="setrow"><span class="si2">⤓</span><div class="stxt"><div class="n">Экспорт данных</div><div class="d">PDF · CSV · JSON</div></div><span class="val">›</span></div>
+          <div class="setrow" onclick="go('about')"><span class="si2">ℹ</span><div class="stxt"><div class="n">О приложении</div></div><span class="val">v1.0 ›</span></div>
+        </div>
+      </div>
+
+      <!-- ===== ABOUT ===== -->
+      <div class="screen" data-screen="about">
+        <div class="backbtn" onclick="go('settings')">‹ настройки</div>
+        <div style="text-align:center;padding:30px 0 10px">
+          <div class="mark" style="width:84px;height:84px;border-radius:26px;margin:0 auto;font-size:42px">D</div>
+          <h2 style="font-family:'Sora';font-size:26px;font-weight:600;margin-top:18px">DriveLog</h2>
+          <div style="color:var(--txt-3);font-size:13px;margin-top:4px">Версия 1.0 · сборка 100</div>
+          <p style="color:var(--txt-2);font-size:13px;line-height:1.7;margin-top:18px;padding:0 14px">Премиальный учёт обслуживания автомобиля. Все данные хранятся только на вашем устройстве.</p>
+        </div>
+        <div class="setgroup" style="margin-top:20px">
+          <div class="setrow"><span class="si2">★</span><div class="stxt"><div class="n">Оценить в App Store</div></div><span class="val">›</span></div>
+          <div class="setrow"><span class="si2">✉</span><div class="stxt"><div class="n">Поддержка</div></div><span class="val">›</span></div>
+          <div class="setrow"><span class="si2">🔒</span><div class="stxt"><div class="n">Политика конфиденциальности</div></div><span class="val">›</span></div>
+          <div class="setrow" onclick="go('dashboard')"><span class="si2">▶</span><div class="stxt"><div class="n">Посмотреть онбординг</div></div><span class="val">›</span></div>
+        </div>
+      </div>
+
+    </div><!-- /screens -->
+
+    <button class="fab" id="fab" onclick="go('add')">+</button>
+
+    <div class="tabbar">
+      <div class="tab" data-tab="garage" onclick="go('garage')"><i style="font-style:normal;font-size:22px">⌂</i>Гараж</div>
+      <div class="tab on" data-tab="dashboard" onclick="go('dashboard')"><i style="font-style:normal;font-size:22px">◉</i>Авто</div>
+      <div class="tab" data-tab="history" onclick="go('history')"><i style="font-style:normal;font-size:22px">≡</i>История</div>
+      <div class="tab" data-tab="reminders" onclick="go('reminders')"><i style="font-style:normal;font-size:22px">◔</i>Напом.</div>
+      <div class="tab" data-tab="settings" onclick="go('settings')"><i style="font-style:normal;font-size:22px">⚙</i>Ещё</div>
+    </div>
+
+  </div><!-- /screenwrap -->
+</div><!-- /phone -->
+
+<script>
+const tabMap={dashboard:'dashboard',garage:'garage',history:'history',stats:'history',reminders:'reminders',settings:'settings',about:'settings',add:'dashboard',tire:'dashboard'};
+const noFab=['add','settings','about','stats','tire'];
+function go(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.dataset.screen===name));
+  const t=tabMap[name];
+  document.querySelectorAll('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab===t));
+  document.getElementById('fab').style.display=noFab.includes(name)?'none':'flex';
+  const sc=document.querySelector('.screen[data-screen="'+name+'"]');
+  if(sc)sc.scrollTop=0;
+}
+document.querySelectorAll('.typecard').forEach(c=>c.addEventListener('click',()=>{
+  document.querySelectorAll('.typecard').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');
+}));
+document.querySelectorAll('.filters .chip').forEach(c=>c.addEventListener('click',()=>{
+  c.parentElement.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));c.classList.add('on');
+}));
+document.querySelectorAll('.toggle').forEach(t=>t.addEventListener('click',()=>t.classList.toggle('off')));
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "DriveLog",
+    "slug": "drivelog",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "drivelog",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#080A14",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#080A14"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.drivelog.app"
+    },
+    "android": {
+      "package": "com.drivelog.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#080A14"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
